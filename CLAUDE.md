@@ -25,6 +25,10 @@ Next.js 14 App Router + TypeScript + Tailwind 3. Client-only app: there is no ba
   - `ExpenseDialogProvider` owns the one add/edit modal. Any component opens it with `useExpenseDialog().openAdd()` / `openEdit(expense)` instead of rendering its own form.
   - `ToastProvider` gives `showToast({ tone, message, action? })`. Deletes use an Undo toast action (`useDeleteWithUndo`) rather than a confirm dialog.
 - **Pages** (`src/app/page.tsx` dashboard, `src/app/expenses/page.tsx` list) are client components that read from these contexts.
+- **Share & Export** (`/exports`) is a cloud-style export hub. Third-party integrations are **simulated** (no network calls). Keep the "Simulated" labelling honest when touching it.
+  - `src/lib/cloud/` holds pure logic: `templates.ts` (Tax Report, Monthly Summary, Category Analysis, Full Backup → `ExportArtifact`), `destinations.ts` (catalog and fake job stages), `schedule.ts` (`computeNextRun`), `snapshot.ts` (share links).
+  - `CloudProvider` (inside `ExpensesProvider`) owns connections, schedules, history and shares in localStorage (`expense-tracker:cloud-v1`). It also holds in-memory background `jobs`, a client-side scheduler that runs due schedules and catches up on missed ones (deduped per slot), and debounced live sync on expense changes.
+  - **Share links are real.** The summary is deflate-compressed into the URL fragment (`/shared#s=…`), so no server is involved. That means links can't be revoked, and expiry is advisory. `decodeSnapshot` validates strictly because the payload is untrusted. Only aggregates go into a snapshot, never descriptions.
 
 ## Conventions that aren't obvious
 
@@ -33,6 +37,8 @@ Next.js 14 App Router + TypeScript + Tailwind 3. Client-only app: there is no ba
 - **Colors are CSS variables** in `src/app/globals.css`, exposed as Tailwind tokens (`bg-surface`, `text-ink-muted`, `bg-accent`, …), with dark mode via `prefers-color-scheme`. Use the tokens, not raw Tailwind palette colors.
 - **Category colors** (`--cat-*`, mapped in `lib/category-style.ts`) are a fixed-order, colorblind-validated palette. Keep each category's color stable and don't reorder them. Chart text uses ink tokens, never the category color.
 - CSV export guards against spreadsheet formula injection in `escapeCsvCell`. Keep that when changing the export.
+- `Modal` ignores `close` events from nested dialogs (React propagates them up the tree). Without that, closing the Connect dialog would also close the dialog that opened it.
+- A `<dialog>` inside a `space-y-*` container picks up a top margin from it, which is why `Modal` forces `!m-auto`.
 - Adding a category: update `CATEGORIES` in `lib/types.ts` plus the matching entries in `lib/category-style.ts` and `globals.css`.
 
 ## Code style

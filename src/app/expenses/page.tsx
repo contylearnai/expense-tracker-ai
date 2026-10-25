@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useDeferredValue, useMemo, useState } from "react";
 import { CategoryChart } from "@/components/CategoryChart";
 import { ExpenseFiltersBar } from "@/components/ExpenseFilters";
@@ -10,8 +11,7 @@ import { useExpenseDialog } from "@/context/ExpenseDialogProvider";
 import { useExpenses } from "@/context/ExpensesProvider";
 import { useToast } from "@/context/ToastProvider";
 import { filterExpenses, sortExpenses, sumCents } from "@/lib/analytics";
-import { downloadCsv, expensesToCsv } from "@/lib/csv";
-import { formatCurrency, todayISO } from "@/lib/format";
+import { formatCurrency } from "@/lib/format";
 import { EMPTY_FILTERS, type ExpenseFilters, type SortKey } from "@/lib/types";
 
 const PAGE_SIZE = 25;
@@ -40,15 +40,6 @@ export default function ExpensesPage() {
     setVisible(PAGE_SIZE);
   };
 
-  const exportCsv = () => {
-    if (filtered.length === 0) {
-      showToast({ tone: "error", message: "Nothing to export — no expenses match the current filters." });
-      return;
-    }
-    downloadCsv(expensesToCsv(filtered), `expenses-${todayISO()}.csv`);
-    showToast({ tone: "success", message: `Exported ${filtered.length} ${filtered.length === 1 ? "expense" : "expenses"} to CSV.` });
-  };
-
   const clearAll = () => {
     const backup = expenses;
     replaceAll([]);
@@ -72,12 +63,12 @@ export default function ExpensesPage() {
           <p className="text-sm text-ink-muted">Search, filter, edit and export your expenses.</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="secondary" onClick={exportCsv} disabled={expenses.length === 0}>
-            <svg viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4" aria-hidden>
-              <path d="M10 3a1 1 0 011 1v7.6l2.3-2.3 1.4 1.4L10 15.4l-4.7-4.7 1.4-1.4L9 11.6V4a1 1 0 011-1zM4 16h12v2H4z" />
-            </svg>
-            Export CSV
-          </Button>
+          <Link
+            href="/exports"
+            className="inline-flex items-center justify-center gap-2 rounded-lg border border-line bg-surface px-3.5 py-2 text-sm font-medium text-ink transition-colors hover:bg-page"
+          >
+            <span aria-hidden>↗</span> Share &amp; export
+          </Link>
           {expenses.length > 0 && (
             <Button variant="ghost" onClick={() => setConfirmClear(true)}>
               Clear all

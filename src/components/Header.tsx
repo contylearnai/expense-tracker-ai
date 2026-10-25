@@ -3,11 +3,13 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useExpenseDialog } from "@/context/ExpenseDialogProvider";
+import { SyncIndicator } from "./cloud/SyncIndicator";
 import { Button } from "./ui";
 
 const NAV = [
-  { href: "/", label: "Dashboard" },
-  { href: "/expenses", label: "Expenses" },
+  { href: "/", label: "Dashboard", short: "Home" },
+  { href: "/expenses", label: "Expenses", short: "Expenses" },
+  { href: "/exports", label: "Share & Export", short: "Share" },
 ];
 
 export function Header() {
@@ -16,14 +18,14 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-30 border-b border-line bg-surface/85 backdrop-blur">
-      <div className="mx-auto flex h-16 max-w-6xl items-center gap-4 px-4 sm:px-6">
+      <div className="mx-auto flex h-16 max-w-6xl items-center gap-2 px-4 sm:gap-4 sm:px-6">
         <Link href="/" className="flex items-center gap-2 font-semibold text-ink">
           <span aria-hidden className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent text-sm font-bold text-white">
             $
           </span>
           <span className="hidden sm:inline">Spendwise</span>
         </Link>
-        <nav aria-label="Main" className="flex gap-1">
+        <nav aria-label="Main" className="flex gap-0.5 sm:gap-1">
           {NAV.map((item) => {
             const active = pathname === item.href;
             return (
@@ -31,16 +33,18 @@ export function Header() {
                 key={item.href}
                 href={item.href}
                 aria-current={active ? "page" : undefined}
-                className={`rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+                className={`whitespace-nowrap rounded-lg px-2.5 py-2 text-sm font-medium transition-colors sm:px-3 ${
                   active ? "bg-page text-ink" : "text-ink-secondary hover:text-ink"
                 }`}
               >
-                {item.label}
+                <span className="sm:hidden">{item.short}</span>
+                <span className="hidden sm:inline">{item.label}</span>
               </Link>
             );
           })}
         </nav>
-        <div className="ml-auto">
+        <div className="ml-auto flex items-center gap-3">
+          <SyncIndicator />
           <Button onClick={openAdd}>
             <span aria-hidden className="text-base leading-none">+</span>
             <span>

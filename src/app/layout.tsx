@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
+import { JobsTray } from "@/components/cloud/JobsTray";
 import { Header } from "@/components/Header";
 import { Providers } from "@/components/Providers";
 import { StorageBanner } from "@/components/StorageBanner";
@@ -27,6 +28,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <StorageBanner />
           <Header />
           <main className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">{children}</main>
+          <JobsTray />
         </Providers>
       </body>
     </html>

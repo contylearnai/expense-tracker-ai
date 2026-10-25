@@ -84,15 +84,19 @@ export function EmptyState({ title, description, action }: { title: string; desc
 }
 
 /** Native <dialog> gives us focus trapping, Escape-to-close and a backdrop for free. */
+const MODAL_WIDTH = { md: "max-w-lg", lg: "max-w-2xl", xl: "max-w-4xl" } as const;
+
 export function Modal({
   open,
   onClose,
   title,
+  size = "md",
   children,
 }: {
   open: boolean;
   onClose: () => void;
   title: string;
+  size?: keyof typeof MODAL_WIDTH;
   children: ReactNode;
 }) {
   const ref = useRef<HTMLDialogElement>(null);
@@ -107,12 +111,15 @@ export function Modal({
   return (
     <dialog
       ref={ref}
-      onClose={onClose}
+      // React propagates `close` from nested dialogs up the component tree; only react to our own.
+      onClose={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
       onClick={(e) => {
         if (e.target === ref.current) onClose();
       }}
       aria-labelledby="modal-title"
-      className="w-[calc(100%-2rem)] max-w-lg rounded-2xl border border-line bg-surface p-0 text-ink shadow-2xl backdrop:bg-black/40 backdrop:backdrop-blur-sm"
+      className={`!m-auto max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] ${MODAL_WIDTH[size]} rounded-2xl border border-line bg-surface p-0 text-ink shadow-2xl backdrop:bg-black/40 backdrop:backdrop-blur-sm`}
     >
       {open && (
         <div className="p-6">
