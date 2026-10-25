@@ -3,6 +3,7 @@
 import { useDeferredValue, useMemo, useState } from "react";
 import { CategoryChart } from "@/components/CategoryChart";
 import { ExpenseFiltersBar } from "@/components/ExpenseFilters";
+import { ExportDrawer } from "@/components/export/ExportDrawer";
 import { ExpenseList } from "@/components/ExpenseList";
 import { Button, Card, EmptyState, Modal, Spinner } from "@/components/ui";
 import { useDeleteWithUndo } from "@/components/useDeleteWithUndo";
@@ -10,8 +11,7 @@ import { useExpenseDialog } from "@/context/ExpenseDialogProvider";
 import { useExpenses } from "@/context/ExpensesProvider";
 import { useToast } from "@/context/ToastProvider";
 import { filterExpenses, sortExpenses, sumCents } from "@/lib/analytics";
-import { downloadCsv, expensesToCsv } from "@/lib/csv";
-import { formatCurrency, todayISO } from "@/lib/format";
+import { formatCurrency } from "@/lib/format";
 import { EMPTY_FILTERS, type ExpenseFilters, type SortKey } from "@/lib/types";
 
 const PAGE_SIZE = 25;
@@ -26,6 +26,7 @@ export default function ExpensesPage() {
   const [sort, setSort] = useState<SortKey>("date-desc");
   const [visible, setVisible] = useState(PAGE_SIZE);
   const [confirmClear, setConfirmClear] = useState(false);
+  const [exportOpen, setExportOpen] = useState(false);
   const deferredFilters = useDeferredValue(filters);
 
   const filtered = useMemo(
@@ -38,15 +39,6 @@ export default function ExpensesPage() {
   const changeFilters = (next: ExpenseFilters) => {
     setFilters(next);
     setVisible(PAGE_SIZE);
-  };
-
-  const exportCsv = () => {
-    if (filtered.length === 0) {
-      showToast({ tone: "error", message: "Nothing to export — no expenses match the current filters." });
-      return;
-    }
-    downloadCsv(expensesToCsv(filtered), `expenses-${todayISO()}.csv`);
-    showToast({ tone: "success", message: `Exported ${filtered.length} ${filtered.length === 1 ? "expense" : "expenses"} to CSV.` });
   };
 
   const clearAll = () => {
@@ -72,11 +64,11 @@ export default function ExpensesPage() {
           <p className="text-sm text-ink-muted">Search, filter, edit and export your expenses.</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="secondary" onClick={exportCsv} disabled={expenses.length === 0}>
+          <Button variant="secondary" onClick={() => setExportOpen(true)} disabled={expenses.length === 0}>
             <svg viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4" aria-hidden>
               <path d="M10 3a1 1 0 011 1v7.6l2.3-2.3 1.4 1.4L10 15.4l-4.7-4.7 1.4-1.4L9 11.6V4a1 1 0 011-1zM4 16h12v2H4z" />
             </svg>
-            Export CSV
+            Export…
           </Button>
           {expenses.length > 0 && (
             <Button variant="ghost" onClick={() => setConfirmClear(true)}>
@@ -149,6 +141,17 @@ export default function ExpensesPage() {
           </div>
         </>
       )}
+
+      <ExportDrawer
+        open={exportOpen}
+        onClose={() => setExportOpen(false)}
+        expenses={expenses}
+        initialQuery={{
+          from: filters.from,
+          to: filters.to,
+          categories: filters.category === "All" ? undefined : [filters.category],
+        }}
+      />
 
       <Modal open={confirmClear} onClose={() => setConfirmClear(false)} title="Delete all expenses?">
         <p className="text-sm text-ink-secondary">

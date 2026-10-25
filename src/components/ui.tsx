@@ -112,7 +112,7 @@ export function Modal({
         if (e.target === ref.current) onClose();
       }}
       aria-labelledby="modal-title"
-      className="w-[calc(100%-2rem)] max-w-lg rounded-2xl border border-line bg-surface p-0 text-ink shadow-2xl backdrop:bg-black/40 backdrop:backdrop-blur-sm"
+      className="!m-auto w-[calc(100%-2rem)] max-w-lg rounded-2xl border border-line bg-surface p-0 text-ink shadow-2xl backdrop:bg-black/40 backdrop:backdrop-blur-sm"
     >
       {open && (
         <div className="p-6">

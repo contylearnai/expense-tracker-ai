@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { CategoryChart } from "@/components/CategoryChart";
 import { ExpenseList } from "@/components/ExpenseList";
 import { MonthlyChart } from "@/components/MonthlyChart";
+import { ExportDrawer } from "@/components/export/ExportDrawer";
 import { SummaryCards } from "@/components/SummaryCards";
 import { Button, Card, CardHeader, EmptyState, Skeleton } from "@/components/ui";
 import { useDeleteWithUndo } from "@/components/useDeleteWithUndo";
@@ -20,6 +21,7 @@ export default function DashboardPage() {
   const { showToast } = useToast();
   const handleDelete = useDeleteWithUndo();
   const recent = useMemo(() => sortExpenses(expenses, "date-desc").slice(0, 6), [expenses]);
+  const [exportOpen, setExportOpen] = useState(false);
 
   if (status === "loading") return <DashboardSkeleton />;
 
@@ -35,7 +37,14 @@ export default function DashboardPage() {
           <h1 className="text-2xl font-semibold tracking-tight">Dashboard</h1>
           <p className="text-sm text-ink-muted">An overview of where your money goes.</p>
         </div>
+        {expenses.length > 0 && (
+          <Button variant="secondary" onClick={() => setExportOpen(true)}>
+            <ExportIcon />
+            Export…
+          </Button>
+        )}
       </div>
+      <ExportDrawer open={exportOpen} onClose={() => setExportOpen(false)} expenses={expenses} />
 
       {expenses.length === 0 ? (
         <Card>
@@ -77,6 +86,14 @@ export default function DashboardPage() {
         </>
       )}
     </div>
+  );
+}
+
+function ExportIcon() {
+  return (
+    <svg viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4" aria-hidden>
+      <path d="M10 3a1 1 0 011 1v7.6l2.3-2.3 1.4 1.4L10 15.4l-4.7-4.7 1.4-1.4L9 11.6V4a1 1 0 011-1zM4 16h12v2H4z" />
+    </svg>
   );
 }
 
