@@ -1,0 +1,77 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Colors are RGB triplets so Tailwind opacity modifiers (bg-accent/10) work. */
+:root {
+  color-scheme: light;
+  --page: 244 244 242;
+  --surface: 252 252 251;
+  --line: 228 227 223;
+  --ink: 11 11 11;
+  --ink-secondary: 82 81 78;
+  --ink-muted: 112 111 106;
+  --accent: 42 120 214;
+  --accent-strong: 28 92 171;
+  --danger: 200 50 50;
+  --success: 22 128 72;
+
+  /* Categorical chart slots, fixed order (validated for CVD separation). */
+  --cat-food: #2a78d6;
+  --cat-transportation: #eb6834;
+  --cat-entertainment: #1baf7a;
+  --cat-shopping: #eda100;
+  --cat-bills: #e87ba4;
+  --cat-other: #008300;
+  --chart-grid: #e4e3df;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --page: 17 17 16;
+    --surface: 26 26 25;
+    --line: 52 52 49;
+    --ink: 240 239 236;
+    --ink-secondary: 195 194 183;
+    --ink-muted: 150 149 140;
+    --accent: 57 135 229;
+    --accent-strong: 134 182 239;
+    --danger: 230 103 103;
+    --success: 64 186 120;
+
+    --cat-food: #3987e5;
+    --cat-transportation: #d95926;
+    --cat-entertainment: #199e70;
+    --cat-shopping: #c98500;
+    --cat-bills: #d55181;
+    --cat-other: #008300;
+    --chart-grid: #343431;
+  }
+}
+
+body {
+  background: rgb(var(--page));
+  color: rgb(var(--ink));
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.toast-in {
+  animation: toast-in 160ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toast-in {
+    animation: none;
+  }
+}
