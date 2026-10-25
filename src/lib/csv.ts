@@ -12,12 +12,12 @@ export function escapeCsvCell(value: string): string {
 }
 
 export function expensesToCsv(expenses: Expense[]): string {
-  const header = ["Date", "Category", "Description", "Amount"];
+  const header = ["Date", "Category", "Amount", "Description"];
   const rows = expenses.map((e) => [
     e.date,
     e.category,
-    e.description,
     (e.amountCents / 100).toFixed(2),
+    e.description,
   ]);
   return [header, ...rows].map((row) => row.map(escapeCsvCell).join(",")).join("\r\n");
 }

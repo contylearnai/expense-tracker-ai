@@ -24,6 +24,6 @@ describe("CSV export", () => {
         updatedAt: "",
       },
     ]);
-    expect(csv).toBe("Date,Category,Description,Amount\r\n2024-05-01,Food,Lunch,12.34");
+    expect(csv).toBe("Date,Category,Amount,Description\r\n2024-05-01,Food,12.34,Lunch");
   });
 });

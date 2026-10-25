@@ -12,6 +12,8 @@ import { useExpenseDialog } from "@/context/ExpenseDialogProvider";
 import { useExpenses } from "@/context/ExpensesProvider";
 import { useToast } from "@/context/ToastProvider";
 import { sortExpenses } from "@/lib/analytics";
+import { downloadCsv, expensesToCsv } from "@/lib/csv";
+import { todayISO } from "@/lib/format";
 import { generateSampleExpenses } from "@/lib/sample-data";
 
 export default function DashboardPage() {
@@ -28,6 +30,10 @@ export default function DashboardPage() {
     showToast({ tone: "success", message: "Loaded sample data. Clear it anytime from the Expenses page." });
   };
 
+  const exportData = () => {
+    downloadCsv(expensesToCsv(sortExpenses(expenses, "date-desc")), `expenses-${todayISO()}.csv`);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
@@ -35,6 +41,11 @@ export default function DashboardPage() {
           <h1 className="text-2xl font-semibold tracking-tight">Dashboard</h1>
           <p className="text-sm text-ink-muted">An overview of where your money goes.</p>
         </div>
+        {expenses.length > 0 && (
+          <Button variant="secondary" onClick={exportData}>
+            Export Data
+          </Button>
+        )}
       </div>
 
       {expenses.length === 0 ? (
